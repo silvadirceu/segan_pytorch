@@ -76,7 +76,7 @@ class SEGAN(Model):
         super(SEGAN, self).__init__(name)
         self.save_path = opts.save_path
         self.preemph = opts.preemph
-        self.reg_loss = getattr(F, opts.reg_loss)
+        #self.reg_loss = getattr(F, opts.reg_loss)
         if generator is None:
             # Build G and D
             self.G = Generator(1,

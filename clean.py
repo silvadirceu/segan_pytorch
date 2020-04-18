@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import json
 import glob
 import os
-
+from utils.io import getAudioLibrosa, getAudio
 
 class ArgParser(object):
 
@@ -48,19 +48,27 @@ def main(opts):
             twavs = f['data'][:]
     else:
         # process every wav in the test_files
+        print("OPTS.TESTFILES: ", opts.test_files)
         if len(opts.test_files) == 1:
             # assume we read directory
-            twavs = glob.glob(os.path.join(opts.test_files[0], '*.wav'))
+            twavs = glob.glob(os.path.join(opts.test_files[0], opts.ext))
         else:
             # assume we have list of files in input
             twavs = opts.test_files
+        print(twavs)
+
     print('Cleaning {} wavs'.format(len(twavs)))
     beg_t = timeit.default_timer()
     for t_i, twav in enumerate(twavs, start=1):
         if not opts.h5:
             tbname = os.path.basename(twav)
-            rate, wav = wavfile.read(twav)
+            #rate, wav = wavfile.read(twav)
+            wav,fs = getAudio(twav)
             wav = normalize_wave_minmax(wav)
+            rate = fs
+            if fs != 16000:
+                wav = librosa.resample(wav, rate, 16000)
+                rate = 16000
         else:
             tbname = 'tfile_{}.wav'.format(t_i)
             wav = twav
@@ -70,12 +78,15 @@ def main(opts):
         if opts.cuda:
             pwav = pwav.cuda()
         g_wav, g_c = segan.generate(pwav)
-        out_path = os.path.join(opts.synthesis_path,
-                                tbname) 
+        out_path = os.path.join(opts.synthesis_path,tbname)
+
+        if rate != fs:
+            g_wav = librosa.resample(g_wav, rate, fs)
+
         if opts.soundfile:
-            sf.write(out_path, g_wav, 16000)
+            sf.write(out_path, g_wav, fs)
         else:
-            wavfile.write(out_path, 16000, g_wav)
+            wavfile.write(out_path, fs, g_wav)
         end_t = timeit.default_timer()
         print('Cleaned {}/{}: {} in {} s'.format(t_i, len(twavs), twav,
                                                  end_t-beg_t))
@@ -94,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--cuda', action='store_true', default=False)
     parser.add_argument('--soundfile', action='store_true', default=False)
     parser.add_argument('--cfg_file', type=str, default=None)
+    parser.add_argument('--ext', type=str, default="*.wav")
 
     opts = parser.parse_args()
 
@@ -106,5 +118,7 @@ if __name__ == '__main__':
     torch.manual_seed(opts.seed)
     if opts.cuda:
         torch.cuda.manual_seed_all(opts.seed)
+
+    print(opts)
 
     main(opts)
