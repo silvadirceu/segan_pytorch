@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import json
 import glob
 import os
-from utils.io import getAudioLibrosa, getAudio
+from utils.io import getAudio
 
 class ArgParser(object):
 
