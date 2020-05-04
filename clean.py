@@ -62,8 +62,8 @@ def main(opts):
     for t_i, twav in enumerate(twavs, start=1):
         if not opts.h5:
             tbname = os.path.basename(twav)
-            #rate, wav = wavfile.read(twav)
-            wav,fs = getAudio(twav)
+            rate, wav = wavfile.read(twav)
+            #wav,fs = getAudio(twav)
             wav = normalize_wave_minmax(wav)
             rate = fs
             if fs != 16000:
