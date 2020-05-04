@@ -65,7 +65,7 @@ def main(opts):
             rate, wav = wavfile.read(twav)
             #wav,fs = getAudio(twav)
             wav = normalize_wave_minmax(wav)
-            rate = fs
+            #rate = fs
             if fs != 16000:
                 wav = librosa.resample(wav, rate, 16000)
                 rate = 16000
