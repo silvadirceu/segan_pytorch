@@ -63,6 +63,7 @@ def main(opts):
         if not opts.h5:
             tbname = os.path.basename(twav)
             rate, wav = wavfile.read(twav)
+            fs = rate
             #wav,fs = getAudio(twav)
             wav = normalize_wave_minmax(wav)
             #rate = fs
