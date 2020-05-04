@@ -135,6 +135,7 @@ class SEGAN(Model):
             if isinstance(x, np.ndarray):
                 x = torch.FloatTensor(x)
             x = x.to(device)
+            x = x.cuda()
             canvas_w, hall = self.infer_G(x, z=z, ret_hid=True)
             nums = []
             for k in hall.keys():
