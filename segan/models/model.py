@@ -134,8 +134,8 @@ class SEGAN(Model):
             if isinstance(x, np.ndarray):
                 x = torch.FloatTensor(x)
             x = x.to(device)
-            #if "cuda" in device and torch.cuda.is_available():
-            #    x = x.cuda()   # <-- Inserida agora
+            if "cuda" in device and torch.cuda.is_available():
+                x = x.cuda()   # <-- Inserida agora
             canvas_w, hall = self.infer_G(x, z=z, ret_hid=True)
             nums = []
             for k in hall.keys():

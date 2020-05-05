@@ -76,8 +76,8 @@ def main(opts):
             twav = tbname
         wav = pre_emphasize(wav, args.preemph)
         pwav = torch.FloatTensor(wav).view(1,1,-1)
-        if opts.cuda:
-            pwav = pwav.cuda()
+        #if opts.cuda:
+        #    pwav = pwav.cuda()
         g_wav, g_c = segan.generate(pwav, device='cuda:0' if opts.cuda else 'cpu') # sem nada device='cpu'
         out_path = os.path.join(opts.synthesis_path,tbname)
 
