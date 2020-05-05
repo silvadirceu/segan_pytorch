@@ -128,7 +128,7 @@ class SEGAN(Model):
                 pad = 0
             if pad  > 0:
                 x[0, 0] = torch.cat((inwav[0, 0, beg_i:beg_i + length],
-                                    torch.zeros(pad).to(device)), dim=0)
+                                    torch.zeros(pad)), dim=0)
             else:
                 x[0, 0] = inwav[0, 0, beg_i:beg_i + length]
             if isinstance(x, np.ndarray):
