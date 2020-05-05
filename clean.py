@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import json
 import glob
 import os
-from utils.io import getAudioLibrosa, getAudio
+from utils.io import getAudio
 
 class ArgParser(object):
 
@@ -62,10 +62,11 @@ def main(opts):
     for t_i, twav in enumerate(twavs, start=1):
         if not opts.h5:
             tbname = os.path.basename(twav)
-            #rate, wav = wavfile.read(twav)
-            wav,fs = getAudio(twav)
+            rate, wav = wavfile.read(twav)
+            fs = rate
+            #wav,fs = getAudio(twav)
             wav = normalize_wave_minmax(wav)
-            rate = fs
+            #rate = fs
             if fs != 16000:
                 wav = librosa.resample(wav, rate, 16000)
                 rate = 16000
@@ -77,7 +78,7 @@ def main(opts):
         pwav = torch.FloatTensor(wav).view(1,1,-1)
         if opts.cuda:
             pwav = pwav.cuda()
-        g_wav, g_c = segan.generate(pwav)
+        g_wav, g_c = segan.generate(pwav, device='cuda:0' if opts.cuda else 'cpu') # sem nada device='cpu'
         out_path = os.path.join(opts.synthesis_path,tbname)
 
         if rate != fs:

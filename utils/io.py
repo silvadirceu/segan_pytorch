@@ -3,7 +3,7 @@ import subprocess
 from scipy.io import wavfile
 import librosa
 
-def getAudio(filename, fs=16000):
+def getAudio(filename, fs=16000, outFile=None):
     """
     Wrap around scipy to load audio.  Since scipy only
     loads wav files, call avconv through a subprocess to
@@ -13,20 +13,21 @@ def getAudio(filename, fs=16000):
     :return (XAudio, Fs): Audio in samples, sample rate
     """
     import os
-    toload = filename
-    tempfilename = ""
-    if not filename[-3::] == 'wav':
-        tempfilename = '%s.wav'%filename[0:-4]
-        if os.path.exists(tempfilename):
-            os.remove(tempfilename)
-        subprocess.call(["avconv", "-i", filename, "-ar", str(fs), tempfilename])
-        toload = tempfilename
-    Fs, XAudio = wavfile.read(toload)
+    import random
+
+    prefix = str(random.randint(1, 2000))
+    if outFile is None:
+        out_filename = 'tmp_' + prefix + '.wav' 
+    else:
+        out_filename = outFile
+
+    subprocess.call(["avconv", "-i", filename, "-ar", str(fs), out_filename])
+    Fs, XAudio = wavfile.read(out_filename)
 
     if len(XAudio.shape) > 1:
         XAudio = np.mean(XAudio, 1)
-    if len(tempfilename) > 0:
-        os.remove(tempfilename)
+    if outFile is None:
+        os.remove(out_filename)
     return (XAudio, Fs)
 
 def getAudioLibrosa(filename, sr=8000):
