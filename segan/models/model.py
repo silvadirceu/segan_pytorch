@@ -128,14 +128,14 @@ class SEGAN(Model):
                 pad = 0
             if pad  > 0:
                 x[0, 0] = torch.cat((inwav[0, 0, beg_i:beg_i + length],
-                                    torch.zeros(pad)), dim=0)
+                                    torch.zeros(pad).to(device)), dim=0)
             else:
                 x[0, 0] = inwav[0, 0, beg_i:beg_i + length]
-            #x = torch.FloatTensor(x)
             if isinstance(x, np.ndarray):
                 x = torch.FloatTensor(x)
             x = x.to(device)
-            x = x.cuda()
+            #if "cuda" in device and torch.cuda.is_available():
+            #    x = x.cuda()   # <-- Inserida agora
             canvas_w, hall = self.infer_G(x, z=z, ret_hid=True)
             nums = []
             for k in hall.keys():
